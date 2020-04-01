@@ -41,7 +41,7 @@ const CONFIG = {
 };
 
 // 拦截，判断token是否过期
-app.use(checkToken())
+// app.use(checkToken())
 
 app.use(session(CONFIG, app));
 

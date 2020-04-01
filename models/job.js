@@ -7,7 +7,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     company: {
       type: DataTypes.INTEGER,
-      comment: '所属公司'
+      comment: '所属公司',
+      references: {
+        model: 'Company',
+        key: 'id'
+      }
     },
     minSalary: {
       type: DataTypes.INTEGER,
@@ -31,7 +35,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     education: {
       type: DataTypes.INTEGER,
-      comment: '学历'
+      defaultValue: 1,
+      comment: '学历(1：大专， 2：本科， 3：硕士， 4：博士， 5：其他)'
     },
     recruitment: {
       type: DataTypes.INTEGER,
@@ -44,6 +49,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Job.associate = function(models) {
     // associations can be defined here
+    Job.belongsTo(models.Company, {
+      foreignKey: 'company'
+    });
   };
   return Job;
 };

@@ -29,7 +29,13 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: null,
       comment: '所在区域'
     }
-  }, {});
+  }, {
+    defaultScope: {
+      attributes: {
+        exclude: ['password', 'createdAt', 'updatedAt'] // 返回的数据排除这些字段
+      }
+    }
+  });
   User.associate = function(models) {
     // associations can be defined here
   };

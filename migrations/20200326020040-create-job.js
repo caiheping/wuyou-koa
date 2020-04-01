@@ -38,7 +38,8 @@ module.exports = {
       },
       education: {
         type: Sequelize.INTEGER,
-        comment: '学历'
+        defaultValue: 1,
+        comment: '学历(1：大专， 2：本科， 3：硕士， 4：博士， 5：其他)'
       },
       recruitment: {
         type: Sequelize.INTEGER,

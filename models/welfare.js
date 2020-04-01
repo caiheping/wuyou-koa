@@ -7,7 +7,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     company: {
       type: DataTypes.INTEGER,
-      comment: '所属公司'
+      comment: '所属公司',
+      references: {
+        model: "Company",
+        key: 'id'
+      }
     },
     createdAt: {
       allowNull: false,
@@ -20,6 +24,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Welfare.associate = function(models) {
     // associations can be defined here
+    Welfare.belongsTo(models.Company, {
+      foreignKey: 'company'
+    });
   };
   return Welfare;
 };
