@@ -14,6 +14,7 @@ router.get('/front/home', async (ctx, next) => {
             }
         ]
     })
+    // let banner1 = await  Models.sequelize.query("SELECT * FROM `banners`") // 原始查询
 
     ctx.body = {
         code: 0,

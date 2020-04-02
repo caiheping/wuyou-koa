@@ -2,53 +2,54 @@ const Router = require('koa-router');
 const Models = require('../../models');
 const Sequelize = require('sequelize');
 const jwt = require('jsonwebtoken')
+const md5 = require('md5');
 const baseOrm = require('../../utils/base_orm')
 const Op = Sequelize.Op;
 
 const router = new Router();
 
+// 秘钥
 const secret = 'cai'
 
 // 登陆接口
 router.post('/login', async (ctx, next) => {
-    // let username = ctx.request.body.username ? ctx.request.body.username : '';
-    // let password = ctx.request.body.password ? md5(ctx.request.body.password) : '';
-    // if (!username || !password) {
-    //     return ctx.body = {
-    //         code: 1,
-    //         data: '用户名或密码不能为空'
-    //     }
-    // }
-    //
-    // let user = await Models.User.findOne({
-    //     where: {
-    //         username,
-    //         is_delete: 0
-    //     }
-    // });
-    // if (user === null) {
-    //     return ctx.body = {
-    //         code: 1,
-    //         data: '不存在该用户'
-    //     }
-    // }
-    // user = await Models.User.findOne({
-    //     where: {
-    //         username,
-    //         password: password
-    //     }
-    // });
-    // if (user === null) {
-    //     return ctx.body = {
-    //         code: 1,
-    //         data: '密码错误'
-    //     }
-    // }
+    let username = ctx.request.body.username ? ctx.request.body.username : '';
+    let password = ctx.request.body.password ? md5(ctx.request.body.password) : '';
+    console.log(ctx.request.body)
+    if (!username || !password) {
+        return ctx.body = {
+            code: 400,
+            data: '用户名或密码不能为空'
+        }
+    }
+    let user = await Models.User.findOne({
+        where: {
+            username
+        }
+    });
+    if (user === null) {
+        return ctx.body = {
+            code: 500,
+            data: '不存在该用户'
+        }
+    }
+    user = await Models.User.findOne({
+        where: {
+            username,
+            password: password
+        }
+    });
+    if (user === null) {
+        return ctx.body = {
+            code: 400,
+            data: '密码错误'
+        }
+    }
 
     const token = jwt.sign(
         {
-            id: 1,
-            username: 'cai'
+            id: user.get('id'),
+            username: user.get('username')
         },
         secret,
         {expiresIn: 60*60*1000}
@@ -63,6 +64,7 @@ router.post('/login', async (ctx, next) => {
     return ctx.body = {
         code: 0,
         data: {
+            user,
             token
         },
         message: 'success'
@@ -76,7 +78,7 @@ page(非必传)： 页码, 例如：http://localhost:8888/admin/base?table_name=
 limit(非必传)：每页条数, 例如：http://localhost:8888/admin/base?table_name=Companylimit=10
 order(非必传): 排序方式, 例如：http://localhost:8888/admin/base?table_name=Company&order=-id,companyType
 where(非必传): 查询条件, 例如： http://localhost:8888/admin/base?table_name=Company&where={"or":[{"id":{"gt":0}}]}(具体参考sequelize)
-include(非必传)： 关联查询（表名）, 例如： http://localhost:8888/admin/base?table_name=Company&include=Job(具体参考sequelize)
+include(非必传)： 关联查询（表名）, 例如： http://localhost:8888/admin/base?table_name=Company&include=["Job"](具体参考sequelize)
 关联查询（只获取关联表的id和company字段）例如：http://localhost:8888/admin/base?table_name=Company&include=[{"model":"Job","attributes":["id","company"]}]
 例子：http://localhost:8888/admin/base?table_name=Company&page=1&limit=10&order=-id&where={"or":[{"id":{"gt":0}}]}&include=Job
 模糊查询（% 再浏览器转义为 %25）： http://localhost:8888/admin/base?table_name=Company&page=1&limit=10&order=-id&where={"and":[{"companyName":{"like":"%25巴巴"}}]}
